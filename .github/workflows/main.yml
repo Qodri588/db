@@ -1,0 +1,46 @@
+name: Run API2DB and Publish Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16' # Sesuaikan dengan versi Node.js yang diperlukan
+
+      # Install dependencies
+      - name: Install Dependencies
+        run: |
+          npm install
+
+      # Run api2db.js
+      - name: Execute API2DB Script
+        run: |
+          node api2db.js
+
+      # Verify file dood.db exists
+      - name: Verify dood.db
+        run: |
+          ls -l dood.db
+
+      # Upload dood.db to Release
+      - name: Create Release and Upload
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: dood.db
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: v1.0.0 # Sesuaikan versi atau buat dinamis
+          releaseName: "Generated dood.db"
+          releaseNotes: "Database generated from api2db.js"
